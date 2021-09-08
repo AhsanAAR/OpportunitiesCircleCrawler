@@ -1,4 +1,5 @@
 from datetime import datetime as dt
+import re
 
 import scrapy
 
@@ -9,7 +10,8 @@ class MyCrawlerSpider(scrapy.Spider):
     start_urls = ['https://www.opportunitiescircle.com/explore-opportunities/']
 
     def parse(self, response, **kwargs):
-        opportunity_links = response.css("article div.elementor-image a::attr(href)").getall()
+        opportunity_links = [re.findall(r".*\/", link)[0] for link in
+                             response.css("article div.elementor-image a::attr(href)").getall()]
 
         for url in opportunity_links:
             yield response.follow(url, callback=self.parse_opportunity_page)
